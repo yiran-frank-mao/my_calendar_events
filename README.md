@@ -12,7 +12,10 @@ Edit [`config.json`](config.json):
 | `interval_days` | Days between events | `50` |
 | `years_ahead` | How far into the future to generate events | `10` |
 | `timezone` | IANA timezone for all-day event dates (optional) | `"Europe/Berlin"` |
-| `title_template` | Event title; `{days}` = days since start | `"It is {days} days!"` |
+| `title_template` | Event title | `"It is {days} days!"` |
+| `description_template` | Event description | `"{days} days since the start date."` |
+
+Templates support `{days}` (days since start) and `{date}` (event date as `YYYY-MM-DD`).
 
 Use any [IANA timezone name](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) (e.g. `America/New_York`, `Asia/Tokyo`). Omit `timezone` to use floating all-day dates with no timezone attached.
 

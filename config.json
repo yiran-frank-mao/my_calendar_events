@@ -3,5 +3,6 @@
   "interval_days": 50,
   "years_ahead": 2,
   "timezone": "Australia/Sydney",
-  "title_template": "Duo for {days} days!"
+  "title_template": "Duo for {days} days!",
+  "description_template": "{days} days since 14 Mar 2026."
 }

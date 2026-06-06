@@ -146,10 +146,15 @@ def resolve_timezone(config: dict) -> str | None:
     return tzname
 
 
+def format_event_template(template: str, day_offset: int, event_date: date) -> str:
+    return template.format(days=day_offset, date=event_date.isoformat())
+
+
 def build_event(
     day_offset: int,
     event_date: date,
     title: str,
+    description: str,
     stamp: datetime,
     tzname: str | None,
 ) -> str:
@@ -164,7 +169,7 @@ def build_event(
         f"DTSTAMP:{stamp.strftime('%Y%m%dT%H%M%SZ')}",
         dtstart,
         f"SUMMARY:{escape_ics_text(title)}",
-        f"DESCRIPTION:{escape_ics_text(f'{day_offset} days since the start date.')}",
+        f"DESCRIPTION:{escape_ics_text(description)}",
         "END:VEVENT",
     ]
     return "\r\n".join(lines)
@@ -175,6 +180,9 @@ def generate_ics(config: dict) -> str:
     interval = int(config["interval_days"])
     years_ahead = int(config.get("years_ahead", 10))
     title_template = config.get("title_template", "It is {days} days!")
+    description_template = config.get(
+        "description_template", "{days} days since the start date."
+    )
     tzname = resolve_timezone(config)
 
     if interval <= 0:
@@ -188,8 +196,11 @@ def generate_ics(config: dict) -> str:
     event_date = start
 
     while event_date <= end:
-        title = title_template.format(days=day_offset)
-        events.append(build_event(day_offset, event_date, title, stamp, tzname))
+        title = format_event_template(title_template, day_offset, event_date)
+        description = format_event_template(description_template, day_offset, event_date)
+        events.append(
+            build_event(day_offset, event_date, title, description, stamp, tzname)
+        )
         day_offset += interval
         event_date = start + timedelta(days=day_offset)
 
