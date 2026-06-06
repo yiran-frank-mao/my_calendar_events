@@ -1,0 +1,38 @@
+name: Generate calendar
+
+on:
+  schedule:
+    # Regenerate weekly so future dates stay covered.
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+    paths:
+      - config.json
+      - scripts/generate_ics.py
+      - .github/workflows/generate-calendar.yml
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Generate ICS file
+        run: python3 scripts/generate_ics.py
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add events.ics
+          if git diff --staged --quiet; then
+            echo "No changes to events.ics"
+          else
+            git commit -m "Update generated events.ics"
+            git push
+          fi
